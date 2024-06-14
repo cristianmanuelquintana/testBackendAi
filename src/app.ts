@@ -3,10 +3,10 @@ import { PaymentQuota, PaymentQuotaStatus, StudentProfile, ExampleProfiles } fro
 import readline from "readline";
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: "insertekey",
 });
 
-// Define the type for conversation messages based on OpenAI API requirements
+
 type ChatCompletionRequestMessage = {
   role: "system" | "user" | "assistant";
   content: string;
@@ -14,24 +14,30 @@ type ChatCompletionRequestMessage = {
 
 let conversationHistory: Array<ChatCompletionRequestMessage> = [];
 
-const agentNames = ["Juan", "Maria", "Carlos", "Lucia", "Pedro"];
+const agentNames = ["Cristian", "Manuel", "Martin", "Lucia", "Sebastian"];
 
 /**
- * Replaces placeholders in the prompt with actual values.
+ * Construye el prompt final con las claves y valores dados.
  *
- * @param {string} prompt The original prompt with placeholders.
- * @param {Record<string, string>} keys The keys and values to replace in the prompt.
- * @returns {string} The final prompt with placeholders replaced by values.
+ * Cada clave se denota como `{clave}` en el prompt y se reemplaza por el valor correspondiente.
+ *
+ * @param {string} prompt El prompt original con las claves provistas.
+ * @param {Record<string, string>} keys Las claves y valores a reemplazar en el prompt.
+ *
+ * @returns {string} El prompt final con las claves reemplazadas por los valores.
  */
 function buildPrompt(prompt: string, keys: Record<string, string>): string {
   return prompt.replace(/{{(.*?)}}/g, (_, key) => keys[key]);
 }
 
 /**
- * Constructs the value for the `student_payments` placeholder in the final prompt.
+ * Construye el valor de la clave `student_payments` para el prompt final.
  *
- * @param {Array<PaymentQuota>} payments The student's payment quotas.
- * @returns {string} The value for the `student_payments` placeholder.
+ * Si la cuota esta completada, no se agrega la fecha de vencimiento.
+ *
+ * @param {Array<PaymentQuota>} payments Las cuotas del alumno.
+ *
+ * @returns {string} El valor de la clave `student_payments` para el prompt final.
  */
 function buildStudentPayments(payments: Array<PaymentQuota>): string {
   return payments
@@ -47,12 +53,12 @@ function buildStudentPayments(payments: Array<PaymentQuota>): string {
 }
 
 /**
- * Creates the prompt to be sent to the OpenAI API.
+ * Arma el prompt con la informacion del usuario
  *
- * @param {StudentProfile} alumno The student's profile.
- * @param {string} consulta The student's query.
- * @param {string} agentName The name of the agent.
- * @returns {string} The final prompt with all placeholders replaced by values.
+ * @param {StudentProfile} alumno 
+ * @param {string} consulta 
+ * @param {string} agentName 
+ * @returns {string} consulta con los valores reemplazados
  */
 function createPrompt(alumno: StudentProfile, consulta: string, agentName: string): string {
   const studentPayments = buildStudentPayments(alumno.payments);
@@ -85,9 +91,9 @@ function createPrompt(alumno: StudentProfile, consulta: string, agentName: strin
 }
 
 /**
- * Fetches the response from the OpenAI API based on the conversation history.
+ * Obtiene la respuesta de la API usando el historial de conversacion
  *
- * @returns {Promise<string>} The response from the OpenAI API.
+ * @returns {Promise<string>} la repuesta de OpenAI
  */
 async function obtenerRespuesta(): Promise<string> {
   const completion = await openai.chat.completions.create({
@@ -139,7 +145,6 @@ async function main() {
         }
 
         const initialPrompt = createPrompt(alumno, consulta, agentName);
-
         conversationHistory.push({ role: "user", content: initialPrompt });
 
         try {
