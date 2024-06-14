@@ -1,5 +1,3 @@
-Here is the revised README with point 3 formatted as a table:
-
 #1
 
 a) Esa información nos indica que uno de los 3 nodos que levantamos hace casi 6 días entró en un loop de reiniciarse. Al momento de la captura, estaba esperando el tiempo de gracia para volver a reiniciarse.
